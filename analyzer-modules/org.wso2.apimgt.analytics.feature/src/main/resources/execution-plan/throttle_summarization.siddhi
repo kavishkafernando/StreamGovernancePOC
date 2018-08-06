@@ -1,0 +1,36 @@
+@App:name('throttle_summarization')
+
+@source(type='wso2event', @map(type='wso2event'))
+Define stream ThrottleStream (
+api STRING,
+context STRING,
+version STRING,
+publisher STRING,
+subscription_policy STRING,
+uri_template STRING,
+method STRING,
+consumer_key STRING,
+application_name STRING,
+application_id STRING,
+application_owner STRING,
+user_id STRING,
+subscriber STRING,
+throttle_count INT,
+throttle_event_time LONG,
+gateway_domain STRING,
+gateway_ip STRING,
+throttled_reason STRING,
+throttled_policy STRING,
+host_name STRING
+);
+
+@BufferSize('3')
+@IgnoreEventsOlderThanBuffer('true')
+@store(type='rdbms', jdbc.url="jdbc:h2:./database/AM_STAT_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=TRUE",
+username="wso2carbon", password="wso2carbon" , jdbc.driver.name="org.h2.Driver")
+define aggregation api_throttle_summary
+from ThrottleStream
+select api, version, publisher, context, consumer_key, application_name, user_id , uri_template, method,
+sum(throttle_count) as total_throttle_count
+group by api, version, publisher, context, consumer_key, application_name, user_id, uri_template, method
+aggregate by throttle_event_time every sec ... year;

@@ -1,0 +1,39 @@
+@App:name('request_summarization')
+
+@source(type='inMemory', topic='apim.analytics.request', @map(type='passThrough'))
+Define stream RequestStream (
+api STRING,
+context STRING,
+version STRING,
+publisher STRING,
+subscription_policy STRING,
+uri_template STRING,
+method STRING,
+consumer_key STRING,
+application_name STRING,
+application_id STRING,
+application_owner STRING,
+user_id STRING,
+subscriber STRING,
+request_count INT,
+request_event_time LONG,
+gateway_domain STRING,
+gateway_ip STRING,
+is_throttled BOOL,
+throttled_reason STRING,
+throttled_policy STRING,
+client_ip STRING,
+user_agent STRING,
+host_name STRING
+);
+
+@BufferSize('3')
+@IgnoreEventsOlderThanBuffer('true')
+@store(type='rdbms', jdbc.url="jdbc:h2:./database/AM_STAT_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=TRUE",
+username="wso2carbon", password="wso2carbon" , jdbc.driver.name="org.h2.Driver")
+define aggregation api_request_summary
+from RequestStream
+select api, version, publisher, context, consumer_key, application_name, user_id , uri_template, method,
+sum(request_count) as total_request_count
+group by api, version, publisher, context, consumer_key, application_name, user_id , uri_template, method
+aggregate by request_event_time every sec ... year;

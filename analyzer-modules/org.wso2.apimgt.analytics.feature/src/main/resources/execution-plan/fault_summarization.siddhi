@@ -1,0 +1,35 @@
+@App:name('fault_summarization')
+
+@source(type='inMemory', topic='apim.analytics.fault', @map(type='passThrough'))
+Define stream FaultStream (
+api STRING,
+context STRING,
+version STRING,
+publisher STRING,
+subscription_policy STRING,
+uri_template STRING,
+method STRING,
+consumer_key STRING,
+application_name STRING,
+application_id STRING,
+application_owner STRING,
+user_id STRING,
+subscriber STRING,
+fault_count INT,
+fault_event_time LONG,
+gateway_domain STRING,
+gateway_ip STRING,
+fault_reason STRING,
+host_name STRING
+);
+
+@BufferSize('3')
+@IgnoreEventsOlderThanBuffer('true')
+@store(type='rdbms', jdbc.url="jdbc:h2:./database/AM_STAT_DB;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=60000;AUTO_SERVER=TRUE",
+username="wso2carbon", password="wso2carbon" , jdbc.driver.name="org.h2.Driver")
+define aggregation api_fault_summary
+from FaultStream
+select api, version, publisher, context, consumer_key, application_name, user_id , uri_template, method,
+sum(fault_count) as total_fault_count
+group by api, version, publisher, context, consumer_key, application_name, user_id, uri_template, method
+aggregate by fault_event_time every sec ... year;

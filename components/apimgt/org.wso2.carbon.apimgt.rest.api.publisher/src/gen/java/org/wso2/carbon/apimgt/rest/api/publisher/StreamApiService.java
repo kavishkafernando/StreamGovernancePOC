@@ -20,7 +20,6 @@
 
 package org.wso2.carbon.apimgt.rest.api.publisher;
 
-
 import org.wso2.carbon.apimgt.core.streams.EventStream;
 import org.wso2.msf4j.Request;
 import javax.ws.rs.core.Response;
@@ -34,5 +33,10 @@ public abstract class StreamApiService {
   , Request request) throws NotFoundException;
 
     public abstract Response streamPost(EventStream stream
-  ,Request request) throws NotFoundException;
+  , Request request) throws NotFoundException;
+
+    public abstract Response streamStreamIdGet(String streamId
+ , String ifNoneMatch
+ , String ifModifiedSince
+  , Request request) throws NotFoundException;
 }

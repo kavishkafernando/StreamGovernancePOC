@@ -726,7 +726,8 @@ public class MappingUtil {
                                 stream.getName(), stream.getProvider(), stream.getVersion()).
                         description(stream.getDescription()).
                         lifeCycleStatus(stream.getLifeCycleStatus()).
-                        endpoint(stream.getEndpoint()).streamType(stream.getStreamType()).
+                        endpoint(stream.getEndpoint()).
+                        streamType(stream.getStreamType()).
                         streamAuthorization(stream.getStreamAuthorization()).
                         visibility(stream.getVisibility()).
                         isProducable(stream.isProducable()).

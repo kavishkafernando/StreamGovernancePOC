@@ -344,4 +344,13 @@ public interface APIManager {
      * @throws APIManagementException if failed to check the context availability
      */
     boolean isStreamNameExist(String streamName) throws APIManagementException;
+
+    /**
+     * Checks if a given API exists
+     *
+     * @param streamId UUID of the Stream
+     * @return boolean result
+     * @throws APIManagementException If failed to check ia Stream exist.
+     */
+    boolean isStreamExists(String streamId) throws APIManagementException;
 }

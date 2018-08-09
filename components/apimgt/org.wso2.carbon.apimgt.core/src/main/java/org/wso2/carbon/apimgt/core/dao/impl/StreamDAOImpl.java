@@ -20,6 +20,7 @@
 
 package org.wso2.carbon.apimgt.core.dao.impl;
 
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.apimgt.core.dao.StreamDAO;
@@ -27,12 +28,10 @@ import org.wso2.carbon.apimgt.core.exception.APIMgtDAOException;
 import org.wso2.carbon.apimgt.core.exception.ExceptionCodes;
 import org.wso2.carbon.apimgt.core.streams.EventStream;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.*;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -160,6 +159,7 @@ public class StreamDAOImpl implements StreamDAO {
             throws SQLException, APIMgtDAOException{
 
         String streamPrimaryKey = stream.getId();
+        Gson gson = new Gson();
         statement.setString(1, stream.getId());
         statement.setString(2, stream.getProvider());
         statement.setString(3, stream.getName());
@@ -169,19 +169,19 @@ public class StreamDAOImpl implements StreamDAO {
         statement.setString(7, stream.getLifeCycleStatus());
         statement.setString(8, String.valueOf(stream.getEndpoint()));
         statement.setString(9, String.valueOf(stream.getStreamType()));
-        statement.setString(10, String.valueOf(stream.getStreamAuthorization()));
+        statement.setString(10, gson.toJson(stream.getStreamAuthorization()));
         statement.setBoolean(11, stream.isProducable());
         statement.setBoolean(12, stream.isCanProducerAccessDirectly());
         statement.setBoolean(13, stream.isCanProducerAccessViaGateway());
-        statement.setString(14, String.valueOf(stream.getProducerAuthorization()));
-        statement.setString(15, String.valueOf(stream.getProducerTransport()));
-        statement.setString(16, String.valueOf(stream.getProducerMessageType()));
+        statement.setString(14, gson.toJson(stream.getProducerAuthorization()));
+        statement.setString(15, gson.toJson(stream.getProducerTransport()));
+        statement.setString(16, gson.toJson(stream.getProducerMessageType()));
         statement.setBoolean(17, stream.isConsumable());
         statement.setBoolean(18, stream.isCanConsumerAccessDirectly());
         statement.setBoolean(19, stream.isCanConsumerAccessViaGateway());
-        statement.setString(20, String.valueOf(stream.getConsumerAuthorization()));
-        statement.setString(21, String.valueOf(stream.getConsumerTransport()));
-        statement.setString(22, String.valueOf(stream.getConsumerDisplay()));
+        statement.setString(20, gson.toJson(stream.getConsumerAuthorization()));
+        statement.setString(21, gson.toJson(stream.getConsumerTransport()));
+        statement.setString(22, gson.toJson(stream.getConsumerDisplay()));
 
         boolean rs = statement.execute();
 
@@ -190,30 +190,46 @@ public class StreamDAOImpl implements StreamDAO {
 
     private EventStream constructStreamFromResultSet(Connection connection, PreparedStatement statement) throws SQLException,
             IOException, APIMgtDAOException {
+        Gson gson = new Gson();
         try (ResultSet rs = statement.executeQuery()) {
             while (rs.next()){
 
-                List<EventStream.Authorization> authorizations = new ArrayList();
-                authorizations.add(EventStream.Authorization.valueOf(rs.getString("STREAM_AUTHORIZATION")));
+                List<EventStream.Authorization> streamAuthorization = Arrays.asList(gson.fromJson(rs.getString("STREAM_AUTHORIZATION"),
+                        EventStream.Authorization[].class));
+                List<EventStream.Authorization> producerAuthorization = Arrays.asList(gson.fromJson(rs.getString("PRODUCER_AUTHORIZATION"),
+                        EventStream.Authorization[].class));
+                List<EventStream.Authorization> consumerAuthorization = Arrays.asList(gson.fromJson(rs.getString("CONSUMER_AUTHORIZATION"),
+                        EventStream.Authorization[].class));
+                List<EventStream.Transport> producerTransport = Arrays.asList(gson.fromJson(rs.getString("PRODUCER_TRANSPORT"),
+                        EventStream.Transport[].class));
+                List<EventStream.Transport> consumerTransport = Arrays.asList(gson.fromJson(rs.getString("CONSUMER_TRANSPORT"),
+                        EventStream.Transport[].class));
+                List<EventStream.MessageType> producerMessage = Arrays.asList(gson.fromJson(rs.getString("PRODUCER_MESSAGE_TYPE"),
+                        EventStream.MessageType[].class));
+                List<EventStream.Display> consumerDisplay = Arrays.asList(gson.fromJson(rs.getString("CONSUMER_DISPLAY"),
+                        EventStream.Display[].class));
+
+
+
                 return new EventStream.StreamBuilder(rs.getString("UUID"), rs.getString("NAME"), rs.getString("PROVIDER"),
                         rs.getString("VERSION")).
                         description(rs.getString("DESCRIPTION")).
                         lifeCycleStatus(rs.getString("LIFECYCLE_STATUS")).
                         streamType(Collections.singleton(rs.getString("STREAM_TYPE"))).
-                        streamAuthorization(authorizations).
+                        streamAuthorization(streamAuthorization).
                         visibility(EventStream.Visibility.valueOf(rs.getString("VISIBILITY"))).
                         isProducable(rs.getBoolean("IS_PRODUCABLE")).
                         canProducerAccessDirectly(rs.getBoolean("CAN_PRODUCER_ACCESS_DIRECTLY")).
                         canProducerAccessViaGateway(rs.getBoolean("CAN_PRODUCER_ACCESS_VIA_GATEWAY")).
-                        producerAuthorization(Collections.singletonList(EventStream.Authorization.valueOf(rs.getString("PRODUCER_AUTHORIZATION")))).
-                        producerTransport(Collections.singletonList(EventStream.Transport.valueOf(rs.getString("PRODUCER_TRANSPORT")))).
-                        producerMessageType(Collections.singletonList(EventStream.MessageType.valueOf(rs.getString("PRODUCER_MESSAGE_TYPE")))).
+                        producerAuthorization(producerAuthorization).
+                        producerTransport(producerTransport).
+                        producerMessageType(producerMessage).
                         isConsumable(rs.getBoolean("IS_CONSUMABLE")).
                         canConsumerAccessDirectly(rs.getBoolean("CAN_CONSUMER_ACCESS_DIRECTLY")).
-                        canConsumerAccessViaGateway(rs.getBoolean("CAN_CONSUMER_ACCESS_VIA_GATEWAY,")).
-                        consumerAuthorization(Collections.singletonList(EventStream.Authorization.valueOf(rs.getString("CONSUMER_AUTHORIZATION")))).
-                        consumerTransport(Collections.singletonList(EventStream.Transport.valueOf(rs.getString("CONSUMER_TRANSPORT")))).
-                        consumerDisplay(Collections.singletonList(EventStream.Display.valueOf(rs.getString("CONSUMER_DISPLAY")))).build();
+                        canConsumerAccessViaGateway(rs.getBoolean("CAN_CONSUMER_ACCESS_VIA_GATEWAY")).
+                        consumerAuthorization(consumerAuthorization).
+                        consumerTransport(consumerTransport).
+                        consumerDisplay(consumerDisplay).build();
             }
         }
         return null;

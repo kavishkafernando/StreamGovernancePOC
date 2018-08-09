@@ -3567,7 +3567,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 #-----------------------------------------------------
-# Retrieving the list of all Streams qualifying under a given search condition
+# Retrieving the list of all APIs qualifying under a given search condition
 #-----------------------------------------------------
     get:
       summary: |
@@ -3629,6 +3629,66 @@ paths:
             The requested media type is not supported
           schema:
             $ref: '#/definitions/Error'
+
+######################################################
+# The "Individual API" resource APIs
+######################################################
+  /stream/{streamId}:
+
+#-----------------------------------------------------
+# Retrieve the details of an Stream definition
+#-----------------------------------------------------
+    get:
+      x-wso2-request: |
+        GET https://127.0.0.1:9443/api/am/publisher/v1.0/stream/7a2298c4-c905-403f-8fac-38c73301631f
+        Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
+      summary: Get details of a Stream
+      description: |
+        Using this operation, you can retrieve complete details of a single Stream. You need to provide the Id of the Stream to retrive it.
+      parameters:
+        - $ref: '#/parameters/streamId'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - API (Individual)
+      responses:
+        200:
+          description: |
+            OK.
+            Requested Stream is returned
+          headers:
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
+            ETag:
+              description: |
+                Entity Tag of the response resource. Used by caches, or in conditional requests (Will be supported in future).
+              type: string
+            Last-Modified:
+              description: |
+                Date and time the resource has been modifed the last time.
+                Used by caches, or in conditional requests (Will be supported in future).
+              type: string
+          schema:
+            $ref: '#/definitions/Stream'
+        304:
+          description: |
+            Not Modified.
+            Empty body because the client has already the latest version of the requested resource (Will be supported in future).
+        404:
+          description: |
+            Not Found.
+            Requested Stream does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        406:
+          description: |
+            Not Acceptable.
+            The requested media type is not supported
+          schema:
+            $ref: '#/definitions/Error'
+
 ######################################################
 # Parameters - required by some of the APIs above
 ######################################################
@@ -3642,6 +3702,17 @@ parameters:
     description: |
       **API ID** consisting of the **UUID** of the API.
       The combination of the provider of the API, name of the API and the version is also accepted as a valid API ID.
+      Should be formatted as **provider-name-version**.
+    required: true
+    type: string
+# Stream Identifier
+# Specified as part of the path expression
+  streamId:
+    name: streamId
+    in: path
+    description: |
+      **Stream ID** consisting of the **UUID** of the Stream.
+      The combination of the provider of the API, name of the Stream and the version is also accepted as a valid Stream ID.
       Should be formatted as **provider-name-version**.
     required: true
     type: string

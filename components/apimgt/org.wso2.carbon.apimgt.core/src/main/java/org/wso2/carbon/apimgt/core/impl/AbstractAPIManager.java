@@ -192,6 +192,16 @@ public abstract class AbstractAPIManager implements APIManager {
         }
     }
 
+
+    public boolean isStreamExists(String streamId) throws APIManagementException {
+        try {
+            return getStreamDAO().isStreamExists(streamId);
+        } catch (APIMgtDAOException e) {
+            String errorMsg = "Error while checking if Stream " + streamId + " exists";
+            log.error(errorMsg, e);
+            throw new APIManagementException(errorMsg, e, e.getErrorHandler());
+        }
+    }
     /**
      * Checks whether the given API context is already registered in the system
      *

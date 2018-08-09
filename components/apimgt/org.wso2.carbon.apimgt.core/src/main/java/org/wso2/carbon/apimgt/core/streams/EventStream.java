@@ -813,7 +813,33 @@ public class EventStream {
             return new EventStream(this);
         }
 
-
+        @Override
+        public String toString() {
+            return "StreamBuilder{" +
+                    "id='" + id + '\'' +
+                    ", provider='" + provider + '\'' +
+                    ", name='" + name + '\'' +
+                    ", version='" + version + '\'' +
+                    ", description='" + description + '\'' +
+                    ", lifeCycleStatus='" + lifeCycleStatus + '\'' +
+                    ", endpoint=" + endpoint +
+                    ", streamType=" + streamType +
+                    ", streamAuthorization=" + streamAuthorization +
+                    ", visibility=" + visibility +
+                    ", isProducable=" + isProducable +
+                    ", canProducerAccessDirectly=" + canProducerAccessDirectly +
+                    ", canProducerAccessViaGateway=" + canProducerAccessViaGateway +
+                    ", producerAuthorization=" + producerAuthorization +
+                    ", producerTransport=" + producerTransport +
+                    ", producerMessageType=" + producerMessageType +
+                    ", isConsumable=" + isConsumable +
+                    ", canConsumerAccessDirectly=" + canConsumerAccessDirectly +
+                    ", canConsumerAccessViaGateway=" + canConsumerAccessViaGateway +
+                    ", consumerAuthorization=" + consumerAuthorization +
+                    ", consumerTransport=" + consumerTransport +
+                    ", consumerDisplay=" + consumerDisplay +
+                    '}';
+        }
     }
 
 

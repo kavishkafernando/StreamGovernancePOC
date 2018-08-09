@@ -850,7 +850,7 @@ public class ApisApi implements Microservice  {
     @OPTIONS
     @PUT
     @Path("/{apiId}/wsdl")
-    @Consumes({ "multipart/form-data" })
+    @Consumes({ "multipart/form-ldata" })
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Update WSDL definition", notes = "This operation can be used to update the WSDL definition of an existing API. WSDL to be updated is passed as a form data parameter `inlineContent`. ", response = void.class, authorizations = {
         @io.swagger.annotations.Authorization(value = "OAuth2Security", scopes = {

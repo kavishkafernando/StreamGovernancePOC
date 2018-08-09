@@ -20,13 +20,19 @@
 
 package org.wso2.carbon.apimgt.rest.api.publisher;
 
+
 import org.wso2.carbon.apimgt.core.streams.EventStream;
 import org.wso2.msf4j.Request;
 import javax.ws.rs.core.Response;
 
 
-public abstract class StreamApiService   {
+public abstract class StreamApiService {
+    public abstract Response streamGet(Integer limit
+ , Integer offset
+ , String query
+ , String ifNoneMatch
+  , Request request) throws NotFoundException;
 
     public abstract Response streamPost(EventStream stream
-  , Request request) throws NotFoundException;
+  ,Request request) throws NotFoundException;
 }

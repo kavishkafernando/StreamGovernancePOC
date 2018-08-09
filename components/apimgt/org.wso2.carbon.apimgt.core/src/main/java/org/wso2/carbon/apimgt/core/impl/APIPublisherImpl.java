@@ -44,7 +44,6 @@ import org.wso2.carbon.apimgt.core.configuration.models.NotificationConfiguratio
 import org.wso2.carbon.apimgt.core.configuration.models.ServiceDiscoveryConfigurations;
 import org.wso2.carbon.apimgt.core.configuration.models.ServiceDiscoveryImplConfig;
 import org.wso2.carbon.apimgt.core.dao.*;
-import org.wso2.carbon.apimgt.core.dao.impl.StreamDAOImpl;
 import org.wso2.carbon.apimgt.core.exception.APIManagementException;
 import org.wso2.carbon.apimgt.core.exception.APIMgtDAOException;
 import org.wso2.carbon.apimgt.core.exception.APIMgtResourceNotFoundException;
@@ -345,8 +344,10 @@ public class APIPublisherImpl extends AbstractAPIManager implements APIPublisher
     }
 
     @Override
-    public EventStream getEventStreambyUUID(String uuid) throws APIManagementException {
-        return null;
+    public EventStream getStreambyUUID(String uuid) throws APIManagementException {
+        EventStream stream = null;
+        stream = super.getStreambyUUID(uuid);
+        return stream;
     }
 
     /**
@@ -2548,19 +2549,11 @@ public class APIPublisherImpl extends AbstractAPIManager implements APIPublisher
         }
 
         try {
-               String name = streamBuilder.getName();
                 createdStream = streamBuilder.build();
-                System.out.println("API just built");
                 APIUtils.validateStream(createdStream);
 
-//                StreamDAOImpl streamDAO = null;
-//
-//                streamDAO.addStream(createdStream);
-//                System.out.println("API got added to DB this works");
-
                 getStreamDAO().addStream(createdStream);
-                System.out.println("API got added to DB");
-                getStreamDAO().isStreamExists("3917659");
+//                getStreamDAO().isStreamExists("3917659");
 
                 APIUtils.logDebug("Stream " + createdStream.getName() + "-" + createdStream.getVersion() + " was created " +
                         "successfully.", log);
@@ -2578,12 +2571,20 @@ public class APIPublisherImpl extends AbstractAPIManager implements APIPublisher
                 ObserverNotifierThreadPool.getInstance().executeTask(observerNotifier);
 
         } catch (APIMgtDAOException e) {
-            String errorMsg = "Error occurred while creating the API - " + streamBuilder.getName();
+            String errorMsg = "Error occurred while creating the Stream - " + streamBuilder.getName();
             log.error(errorMsg);
             throw new APIManagementException(errorMsg, e, e.getErrorHandler());
         }
 
         return streamBuilder.getId();
+    }
+
+    @Override
+    public List<EventStream> searchStreams(Integer limit, Integer offset, String query) throws APIManagementException {
+        List<EventStream> streamResults;
+        String username = getUsername();
+        streamResults = getStreamDAO().getStreams(username);
+        return streamResults;
     }
 
     private boolean validateScope(String swagger) throws APIManagementException {

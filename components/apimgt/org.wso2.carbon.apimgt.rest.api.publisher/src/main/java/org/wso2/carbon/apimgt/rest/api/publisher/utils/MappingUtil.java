@@ -45,35 +45,7 @@ import org.wso2.carbon.apimgt.core.models.policy.ThreatProtectionPolicy;
 import org.wso2.carbon.apimgt.core.streams.EventStream;
 import org.wso2.carbon.apimgt.core.util.APIMgtConstants;
 import org.wso2.carbon.apimgt.core.util.APIUtils;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIDefinitionValidationResponseDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIDefinitionValidationResponse_wsdlInfoDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIDefinitionValidationResponse_wsdlInfo_bindingInfoDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIDefinitionValidationResponse_wsdlInfo_endpointsDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIInfoDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIListDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.API_businessInformationDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.API_corsConfigurationDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.API_endpointDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.API_operationsDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.API_threatProtectionPoliciesDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.API_threatProtectionPolicies_listDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.ApplicationDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.DedicatedGatewayDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.DocumentDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.DocumentListDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.EndPointDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.EndPoint_endpointSecurityDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.LabelDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.LabelListDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.ScopeDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.ScopeListDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.ScopeList_listDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.Scope_bindingsDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.SubscriptionDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.SubscriptionListDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.ThreatProtectionPolicyDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.dto.WorkflowResponseDTO;
+import org.wso2.carbon.apimgt.rest.api.publisher.dto.*;
 import org.wso2.carbon.apimgt.rest.api.publisher.dto.WorkflowResponseDTO.WorkflowStatusEnum;
 
 import java.util.ArrayList;
@@ -86,7 +58,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Utility class for mapping rest api Models to Core
+ * Utility class for mapping rest api Models to Core.
  */
 public class MappingUtil {
 
@@ -328,6 +300,26 @@ public class MappingUtil {
     }
 
     /**
+     * Converts {@link EventStream} List to an {@link StreamInfoDTO} List.
+     *
+     * @param streamSummaryList
+     * @return
+     */
+    private static List<StreamInfoDTO> toStreamInfo(List<EventStream> streamSummaryList) {
+        List<StreamInfoDTO> streamInfoList = new ArrayList<StreamInfoDTO>();
+        for (EventStream streamSummary : streamSummaryList) {
+            StreamInfoDTO streamInfo = new StreamInfoDTO();
+            streamInfo.setId(streamSummary.getId());
+            streamInfo.setDescription(streamSummary.getDescription());
+            streamInfo.setName(streamSummary.getName());
+            streamInfo.setProvider(streamSummary.getProvider());
+            streamInfo.setLifeCycleStatus(streamSummary.getLifeCycleStatus());
+            streamInfo.setVersion(streamSummary.getVersion());
+            streamInfoList.add(streamInfo);
+        }
+        return streamInfoList;
+    }
+    /**
      * Converts API list to APIListDTO list.
      *
      * @param apisResult List of APIs
@@ -340,6 +332,19 @@ public class MappingUtil {
         // apiListDTO.setPrevious(previous);
         apiListDTO.setList(toAPIInfo(apisResult));
         return apiListDTO;
+    }
+
+    /**
+     * Converts Stream list to StreamListDTO list.
+     *
+     * @param streamResult List of APIs
+     * @return StreamListDTO object
+     */
+    public static StreamListDTO toStreamListDTO(List<EventStream> streamResult) {
+        StreamListDTO streamListDTO = new StreamListDTO();
+        streamListDTO.setCount(streamResult.size());
+        streamListDTO.setList(toStreamInfo(streamResult));
+        return streamListDTO;
     }
 
     /**
@@ -719,6 +724,7 @@ public class MappingUtil {
     public static EventStream.StreamBuilder toEventStream(EventStream stream){
                         EventStream.StreamBuilder streamBuilder = new EventStream.StreamBuilder(stream.getId(),
                                 stream.getName(), stream.getProvider(), stream.getVersion()).
+                        description(stream.getDescription()).
                         lifeCycleStatus(stream.getLifeCycleStatus()).
                         endpoint(stream.getEndpoint()).streamType(stream.getStreamType()).
                         streamAuthorization(stream.getStreamAuthorization()).

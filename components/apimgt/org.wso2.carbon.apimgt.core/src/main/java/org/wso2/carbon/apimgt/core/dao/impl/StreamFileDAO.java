@@ -26,6 +26,8 @@ import org.wso2.carbon.apimgt.core.streams.EventStream;
 import org.wso2.carbon.apimgt.core.streams.FileStream;
 import org.wso2.carbon.apimgt.core.util.APIFileUtils;
 
+import java.util.List;
+
 
 /**
  * File based implementation of the StreamDAO interface.
@@ -61,5 +63,15 @@ public class StreamFileDAO implements StreamDAO {
         String streamExportDirectory = APIFileUtils.getStreamBaseDirectory(storagePath, fileStream);
         APIFileUtils.createDirectory(streamExportDirectory);
         APIFileUtils.exportStreamDefinitionToFileSystem(fileStream, streamExportDirectory);
+    }
+
+    @Override
+    public EventStream getEventStream(String streamID) throws APIMgtDAOException {
+        return null;
+    }
+
+    @Override
+    public List<EventStream> getStreams(String user) throws APIMgtDAOException {
+        return null;
     }
 }

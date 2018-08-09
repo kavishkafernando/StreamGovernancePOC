@@ -1,0 +1,43 @@
+# Ignore everything in this directory
+target
+.classpath
+.settings
+.project
+*.iml
+*.iws
+*.ipr
+*.swagger-codegen-ignore
+*~
+.idea
+*.DS_Store
+*osgi-imports
+features/apimgt/org.wso2.carbon.apimgt.core.feature/src/main/resources/repository/database/WSO2AM_DB.h2.db
+features/apimgt/org.wso2.carbon.apimgt.gateway.feature/src/main/resources/am#sample#calculator#*.war
+features/apimgt/org.wso2.carbon.apimgt.gateway.feature/src/main/resources/am#sample#pizzashack#*.war
+features/apimgt/org.wso2.carbon.apimgt.rest.api.dcr.feature/src/main/resources/client-registration#*.war
+features/apimgt/org.wso2.carbon.apimgt.rest.api.publisher.feature/src/main/resources/api#am#publisher#*.war
+features/apimgt/org.wso2.carbon.apimgt.rest.api.store.feature/src/main/resources/api#am#store#*.war
+features/apimgt/org.wso2.carbon.apimgt.rest.api.admin.feature/src/main/resources/api#am#admin#*.war
+features/apimgt/org.wso2.carbon.apimgt.core.feature/src/main/resources/throttle#data#*.war
+features/apimgt/org.wso2.carbon.apimgt.rest.api.publisher.feature/src/main/resources/api-docs/main.js
+features/apimgt/org.wso2.carbon.apimgt.rest.api.publisher.feature/src/main/resources/api-docs/package.json
+features/apimgt/org.wso2.carbon.apimgt.rest.api.store.feature/src/main/resources/api-docs/main.js
+features/apimgt/org.wso2.carbon.apimgt.rest.api.store.feature/src/main/resources/api-docs/package.json
+features/org.wso2.carbon.apimgt.lifecycle.manager.feature/resources/database/
+features/apimgt/org.wso2.carbon.apimgt.core.feature/resources/database/
+lcm/features/org.wso2.carbon.apimgt.lifecycle.manager.feature/resources/database/WSO2LIFECYCLE_DB.h2.db
+components/apimgt/org.wso2.carbon.apimgt.rest.api.commons/src/main/resources/publisher-api.yaml
+components/apimgt/org.wso2.carbon.apimgt.rest.api.commons/src/main/resources/store-api.yaml
+components/apimgt/org.wso2.carbon.apimgt.rest.api.commons/src/main/resources/analytics-api.yaml
+components/apimgt/org.wso2.carbon.apimgt.rest.api.commons/src/main/resources/admin-api.yaml
+components/apimgt/org.wso2.carbon.apimgt.core/src/test/resources/amdb/
+#################
+## NPM
+#################
+node_modules/
+dist
+npm-debug.log
+#################
+### VS_CODE
+##################
+.vscode

@@ -30,6 +30,7 @@ import org.wso2.carbon.apimgt.core.models.DocumentInfo;
 import org.wso2.carbon.apimgt.core.models.Endpoint;
 import org.wso2.carbon.apimgt.core.models.Rating;
 import org.wso2.carbon.apimgt.core.models.UriTemplate;
+import org.wso2.carbon.apimgt.core.streams.EventStream;
 import org.wso2.carbon.apimgt.core.util.APIMgtConstants.APILCWorkflowStatus;
 
 import java.io.InputStream;
@@ -899,4 +900,6 @@ public interface ApiDAO {
      * @throws APIMgtDAOException if error occurs while accessing data layer
      */
     DedicatedGateway getDedicatedGateway(String apiId) throws APIMgtDAOException;
+
+
 }

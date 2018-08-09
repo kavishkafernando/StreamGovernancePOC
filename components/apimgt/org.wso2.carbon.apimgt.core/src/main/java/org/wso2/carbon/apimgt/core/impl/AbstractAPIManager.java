@@ -46,6 +46,7 @@ import org.wso2.carbon.apimgt.core.models.DocumentContent;
 import org.wso2.carbon.apimgt.core.models.DocumentInfo;
 import org.wso2.carbon.apimgt.core.models.Label;
 import org.wso2.carbon.apimgt.core.models.Subscription;
+import org.wso2.carbon.apimgt.core.streams.EventStream;
 import org.wso2.carbon.apimgt.core.util.APIUtils;
 import org.wso2.carbon.apimgt.core.workflow.Workflow;
 
@@ -55,7 +56,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * This class contains the implementation of the common methods for Publisher and store
+ * This class contains the implementation of the common methods for Publisher and store.
  */
 public abstract class AbstractAPIManager implements APIManager {
 
@@ -726,6 +727,25 @@ public abstract class AbstractAPIManager implements APIManager {
 
         } catch (APIMgtDAOException e) {
             String errorMsg = "Couldn't check Stream Name " + streamName + "Exists";
+            log.error(errorMsg, e);
+            throw new APIManagementException(errorMsg, e, e.getErrorHandler());
+        }
+    }
+
+
+    /**
+     * Returns details of an Stream.
+     *
+     * @param uuid UUID of the Stream's registry artifact
+     * @return A Stream object related to the given artifact id or null
+     * @throws APIManagementException if failed get Stream from String
+     */
+    @Override
+    public EventStream getStreambyUUID(String uuid) throws APIManagementException {
+        try {
+            return streamDAO.getEventStream(uuid);
+        } catch (APIMgtDAOException e) {
+            String errorMsg = "Error occurred while retrieving STream with id " + uuid;
             log.error(errorMsg, e);
             throw new APIManagementException(errorMsg, e, e.getErrorHandler());
         }

@@ -669,4 +669,13 @@ public interface APIPublisher extends APIManager {
      * @throws APIManagementException if failed to add Stream
      */
     String addEventStream(EventStream.StreamBuilder streamBuilder) throws APIManagementException;
+
+    /**
+     * @param limit  Number of search results returned
+     * @param offset Starting index of the search results
+     * @param query  Search query
+     * @return List of Streams
+     * @throws APIManagementException If failed to search for apis with given query.
+     */
+    List<EventStream> searchStreams(Integer limit, Integer offset, String query) throws APIManagementException;
 }

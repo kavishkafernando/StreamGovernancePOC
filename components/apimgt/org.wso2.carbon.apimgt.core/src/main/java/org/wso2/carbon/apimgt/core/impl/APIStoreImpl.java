@@ -1893,7 +1893,7 @@ public class APIStoreImpl extends AbstractAPIManager implements APIStore, APIMOb
     }
 
     @Override
-    public EventStream getEventStreambyUUID(String uuid) throws APIManagementException {
+    public EventStream getStreambyUUID(String uuid) throws APIManagementException {
         return null;
     }
 }

@@ -31,6 +31,7 @@ import org.wso2.carbon.apimgt.rest.api.common.util.RestApiUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.*;
 import org.wso2.carbon.apimgt.rest.api.publisher.NotFoundException;
 import org.wso2.carbon.apimgt.rest.api.common.dto.ErrorDTO;
+import org.wso2.carbon.apimgt.rest.api.publisher.dto.StreamListDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.utils.MappingUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.utils.RestAPIPublisherUtil;
 import org.wso2.msf4j.Request;
@@ -41,7 +42,41 @@ import java.util.HashMap;
 public class StreamApiServiceImpl extends StreamApiService {
 
     private static final Logger log = LoggerFactory.getLogger(StreamApiServiceImpl.class);
+    /**
+     * Retrives all Streams that qualifies for the given fitering attributes
+     *
+     * @param limit       maximum Streams to return
+     * @param offset      starting position of the pagination
+     * @param query       search query
+     * @param ifNoneMatch If-None-Match header value
+     * @param request     msf4j request object
+     * @return a list of qualifying APIs
+     * @throws NotFoundException When the particular resource does not exist in the system
+     */
+    @Override
+    public Response streamGet(Integer limit, Integer offset, String query, String ifNoneMatch, Request request) throws NotFoundException {
+        String username = RestApiUtil.getLoggedInUsername(request);
+        StreamListDTO streamListDTO = null;
+        try {
+            streamListDTO = MappingUtil.toStreamListDTO(RestAPIPublisherUtil.getApiPublisher(username).searchStreams(limit, offset, query));
+            return Response.ok().entity(streamListDTO).build();
+        } catch (APIManagementException e) {
+            String errorMessage = "Error while retrieving Streams";
+            HashMap<String, String> paramList = new HashMap<String, String>();
+            ErrorDTO errorDTO = RestApiUtil.getErrorDTO(e.getErrorHandler(), paramList, e);
+            log.error(errorMessage, e);
+            return Response.status(e.getErrorHandler().getHttpStatusCode()).entity(errorDTO).build();
+        }
+    }
 
+    /**
+     * Creates a new Stream
+     *
+     * @param stream    EventStream model including the Stream details
+     * @param request msf4j request object
+     * @return Newly created Stream
+     * @throws NotFoundException When the particular resource does not exist in the system
+     */
     @Override
     public Response streamPost(EventStream stream, Request request) throws NotFoundException {
         System.out.println("Stream API is working");
@@ -50,7 +85,7 @@ public class StreamApiServiceImpl extends StreamApiService {
         try {
             APIPublisher apiPublisher = RestAPIPublisherUtil.getApiPublisher(username);
             apiPublisher.addEventStream(streamBuilder);
-            EventStream returnStream = apiPublisher.getEventStreambyUUID(streamBuilder.getId());
+            EventStream returnStream = apiPublisher.getStreambyUUID(streamBuilder.getId());
             return Response.status(Response.Status.CREATED).entity(MappingUtil.toEventStream(returnStream)).build();
 
         } catch (APIManagementException e) {

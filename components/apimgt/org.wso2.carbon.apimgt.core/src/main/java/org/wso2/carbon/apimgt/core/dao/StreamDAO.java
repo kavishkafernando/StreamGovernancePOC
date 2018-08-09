@@ -20,7 +20,12 @@
 package org.wso2.carbon.apimgt.core.dao;
 
 import org.wso2.carbon.apimgt.core.exception.APIMgtDAOException;
+import org.wso2.carbon.apimgt.core.models.API;
 import org.wso2.carbon.apimgt.core.streams.EventStream;
+
+import java.util.List;
+import java.util.Set;
+
 /**
  * Provides access to Stream data layer.
  */
@@ -63,4 +68,24 @@ public interface StreamDAO {
      *
      */
     void addStream(EventStream stream) throws APIMgtDAOException;
+
+    /**
+     * Retrieve a given instance of an Stream
+     *
+     * @param streamID The UUID that uniquely identifies an Stream
+     * @return valid {@link EventStream} object or throws APIMgtDAOException
+     * @throws APIMgtDAOException if error occurs while accessing data layer
+     *
+     */
+    EventStream getEventStream(String streamID) throws APIMgtDAOException;
+
+    /**
+     * Retrieves summary data of all available Streams.
+     *
+     * @param user The userName of the current user
+     * @return {@code List<EventStream>} matching results
+     * @throws APIMgtDAOException if error occurs while accessing data layer
+     *
+     */
+    List<EventStream> getStreams(String user) throws APIMgtDAOException;
 }

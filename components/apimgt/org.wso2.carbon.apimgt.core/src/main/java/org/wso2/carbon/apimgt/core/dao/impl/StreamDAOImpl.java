@@ -24,12 +24,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.apimgt.core.dao.StreamDAO;
 import org.wso2.carbon.apimgt.core.exception.APIMgtDAOException;
+import org.wso2.carbon.apimgt.core.exception.ExceptionCodes;
 import org.wso2.carbon.apimgt.core.streams.EventStream;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Default implementation of the StreamDAO interface. Uses SQL syntax that is common to H2 and MySQL DBs.
@@ -48,6 +53,14 @@ public class StreamDAOImpl implements StreamDAO {
             "PRODUCER_MESSAGE_TYPE, IS_CONSUMABLE, CAN_CONSUMER_ACCESS_DIRECTLY, CAN_CONSUMER_ACCESS_VIA_GATEWAY, " +
             "CONSUMER_AUTHORIZATION, CONSUMER_TRANSPORT, CONSUMER_DISPLAY) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
             "?,?,?)";
+
+    private static final String STREAM_SELECT = "SELECT UUID, PROVIDER, NAME, VERSION, DESCRIPTION, " +
+            "VISIBILITY, LIFECYCLE_STATUS, ENDPOINT, STREAM_TYPE, STREAM_AUTHORIZATION, IS_PRODUCABLE, " +
+            "CAN_PRODUCER_ACCESS_DIRECTLY, CAN_PRODUCER_ACCESS_VIA_GATEWAY, PRODUCER_AUTHORIZATION, PRODUCER_TRANSPORT," +
+            "PRODUCER_MESSAGE_TYPE, IS_CONSUMABLE, CAN_CONSUMER_ACCESS_DIRECTLY, CAN_CONSUMER_ACCESS_VIA_GATEWAY, " +
+            "CONSUMER_AUTHORIZATION, CONSUMER_TRANSPORT, CONSUMER_DISPLAY FROM AM_STREAM";
+
+    private static final String STREAM_SUMMARY_SELECT = "SELECT UUID, PROVIDER, NAME, VERSION, LIFECYCLE_STATUS FROM AM_STREAM";
 
     public StreamDAOImpl(ApiDAOVendorSpecificStatements sqlStatements) {
         this.sqlStatements = sqlStatements;
@@ -104,6 +117,37 @@ public class StreamDAOImpl implements StreamDAO {
         }
     }
 
+    @Override
+    public EventStream getEventStream(String streamID) throws APIMgtDAOException {
+        final String query = STREAM_SELECT + " WHERE UUID = ? ";
+        try (Connection connection = DAOUtil.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setString(1, streamID);
+
+            EventStream stream = constructStreamFromResultSet(connection, statement);
+            if (stream == null) {
+                throw new APIMgtDAOException("Stream with ID " + streamID + " does not exist", ExceptionCodes.STREAM_NOT_FOUND);
+            }
+            return stream;
+        } catch (SQLException | IOException e){
+            throw new APIMgtDAOException(DAOUtil.DAO_ERROR_PREFIX + "getting Stream: " + streamID, e);
+        }
+
+    }
+
+    @Override
+    public List<EventStream> getStreams(String user) throws APIMgtDAOException {
+        final String query = STREAM_SUMMARY_SELECT + " WHERE PROVIDER = ? ";
+        try (Connection connection = DAOUtil.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)){
+            int index = 0;
+            statement.setString(++index, user);
+            return constructStreamSummaryList(connection, statement);
+        } catch (SQLException e){
+            throw new APIMgtDAOException(DAOUtil.DAO_ERROR_PREFIX + "getting Streams", e);
+        }
+    }
+
     /**
      * Method for adding Stream related information
      *
@@ -144,24 +188,51 @@ public class StreamDAOImpl implements StreamDAO {
     }
 
 
+    private EventStream constructStreamFromResultSet(Connection connection, PreparedStatement statement) throws SQLException,
+            IOException, APIMgtDAOException {
+        try (ResultSet rs = statement.executeQuery()) {
+            while (rs.next()){
 
-//    static void initStream() throws APIMgtDAOException {
-//        try (Connection connection = DAOUtil.getConnection()) {
-//            try {
-//                if (!isStreamExist(connection)) {
-//                    connection.setAutoCommit(false);
-//                    addStream(connection);
-//                    connection.commit();
-//                }
-//            } catch (SQLException e) {
-//                connection.rollback();
-//                throw new APIMgtDAOException(DAOUtil.DAO_ERROR_PREFIX + "adding API types", e);
-//            } finally {
-//                connection.setAutoCommit(DAOUtil.isAutoCommit());
-//            }
-//        } catch (SQLException e) {
-//            throw new APIMgtDAOException(DAOUtil.DAO_ERROR_PREFIX + "adding API types", e);
-//        }
-//    }
+                List<EventStream.Authorization> authorizations = new ArrayList();
+                authorizations.add(EventStream.Authorization.valueOf(rs.getString("STREAM_AUTHORIZATION")));
+                return new EventStream.StreamBuilder(rs.getString("UUID"), rs.getString("NAME"), rs.getString("PROVIDER"),
+                        rs.getString("VERSION")).
+                        description(rs.getString("DESCRIPTION")).
+                        lifeCycleStatus(rs.getString("LIFECYCLE_STATUS")).
+                        streamType(Collections.singleton(rs.getString("STREAM_TYPE"))).
+                        streamAuthorization(authorizations).
+                        visibility(EventStream.Visibility.valueOf(rs.getString("VISIBILITY"))).
+                        isProducable(rs.getBoolean("IS_PRODUCABLE")).
+                        canProducerAccessDirectly(rs.getBoolean("CAN_PRODUCER_ACCESS_DIRECTLY")).
+                        canProducerAccessViaGateway(rs.getBoolean("CAN_PRODUCER_ACCESS_VIA_GATEWAY")).
+                        producerAuthorization(Collections.singletonList(EventStream.Authorization.valueOf(rs.getString("PRODUCER_AUTHORIZATION")))).
+                        producerTransport(Collections.singletonList(EventStream.Transport.valueOf(rs.getString("PRODUCER_TRANSPORT")))).
+                        producerMessageType(Collections.singletonList(EventStream.MessageType.valueOf(rs.getString("PRODUCER_MESSAGE_TYPE")))).
+                        isConsumable(rs.getBoolean("IS_CONSUMABLE")).
+                        canConsumerAccessDirectly(rs.getBoolean("CAN_CONSUMER_ACCESS_DIRECTLY")).
+                        canConsumerAccessViaGateway(rs.getBoolean("CAN_CONSUMER_ACCESS_VIA_GATEWAY,")).
+                        consumerAuthorization(Collections.singletonList(EventStream.Authorization.valueOf(rs.getString("CONSUMER_AUTHORIZATION")))).
+                        consumerTransport(Collections.singletonList(EventStream.Transport.valueOf(rs.getString("CONSUMER_TRANSPORT")))).
+                        consumerDisplay(Collections.singletonList(EventStream.Display.valueOf(rs.getString("CONSUMER_DISPLAY")))).build();
+            }
+        }
+        return null;
+    }
+
+
+    private List<EventStream> constructStreamSummaryList(Connection connection, PreparedStatement statement) throws SQLException {
+        List<EventStream> streamList = new ArrayList<>();
+        try (ResultSet rs = statement.executeQuery()){
+            while (rs.next()){
+                EventStream streamSummary = new EventStream.StreamBuilder(rs.getString("UUID"), rs.getString("NAME"),
+                        rs.getString("PROVIDER"), rs.getString("VERSION")).
+                        lifeCycleStatus(rs.getString("LIFECYCLE_STATUS")).build();
+
+                streamList.add(streamSummary);
+            }
+
+        }
+        return streamList;
+    }
 
 }

@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This interface mainly used to have the common methods to publisher and store
+ * This interface mainly used to have the common methods to publisher and store.
  */
 public interface APIManager {
     /**
@@ -334,7 +334,7 @@ public interface APIManager {
      * @return An EventStream object related to the given artifact id or null
      * @throws APIManagementException if failed get Stream from String
      */
-    EventStream getEventStreambyUUID(String uuid) throws APIManagementException;
+    EventStream getStreambyUUID(String uuid) throws APIManagementException;
 
     /**
      * Checks whether the given API name is already registered in the system

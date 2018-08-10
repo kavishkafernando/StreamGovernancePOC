@@ -27,7 +27,6 @@ import org.wso2.carbon.apimgt.core.dao.StreamDAO;
 import org.wso2.carbon.apimgt.core.exception.APIMgtDAOException;
 import org.wso2.carbon.apimgt.core.exception.ExceptionCodes;
 import org.wso2.carbon.apimgt.core.streams.EventStream;
-
 import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -158,8 +157,8 @@ public class StreamDAOImpl implements StreamDAO {
     private void addStreamRelatedInformation(Connection connection, PreparedStatement statement, final EventStream stream)
             throws SQLException, APIMgtDAOException{
 
-        String streamPrimaryKey = stream.getId();
         Gson gson = new Gson();
+
         statement.setString(1, stream.getId());
         statement.setString(2, stream.getProvider());
         statement.setString(3, stream.getName());
@@ -236,17 +235,18 @@ public class StreamDAOImpl implements StreamDAO {
     }
 
 
-    private List<EventStream> constructStreamSummaryList(Connection connection, PreparedStatement statement) throws SQLException {
+    private List<EventStream> constructStreamSummaryList(Connection connection, PreparedStatement statement)
+            throws SQLException {
         List<EventStream> streamList = new ArrayList<>();
         try (ResultSet rs = statement.executeQuery()){
             while (rs.next()){
-                EventStream streamSummary = new EventStream.StreamBuilder(rs.getString("UUID"), rs.getString("NAME"),
-                        rs.getString("PROVIDER"), rs.getString("VERSION")).
+                EventStream streamSummary = new EventStream.StreamBuilder(rs.getString("UUID"),
+                        rs.getString("NAME"), rs.getString("PROVIDER"),
+                        rs.getString("VERSION")).
                         lifeCycleStatus(rs.getString("LIFECYCLE_STATUS")).build();
 
                 streamList.add(streamSummary);
             }
-
         }
         return streamList;
     }

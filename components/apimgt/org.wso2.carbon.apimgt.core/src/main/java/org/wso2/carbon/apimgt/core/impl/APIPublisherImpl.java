@@ -2553,7 +2553,6 @@ public class APIPublisherImpl extends AbstractAPIManager implements APIPublisher
                 APIUtils.validateStream(createdStream);
 
                 getStreamDAO().addStream(createdStream);
-//                getStreamDAO().isStreamExists("3917659");
 
                 APIUtils.logDebug("Stream " + createdStream.getName() + "-" + createdStream.getVersion() + " was created " +
                         "successfully.", log);

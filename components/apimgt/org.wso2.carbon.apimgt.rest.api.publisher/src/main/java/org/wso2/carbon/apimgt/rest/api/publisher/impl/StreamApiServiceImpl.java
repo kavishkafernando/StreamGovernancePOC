@@ -18,7 +18,6 @@
  *
  */
 
-
 package org.wso2.carbon.apimgt.rest.api.publisher.impl;
 
 import org.slf4j.Logger;
@@ -37,7 +36,6 @@ import org.wso2.carbon.apimgt.rest.api.publisher.dto.StreamListDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.utils.MappingUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.utils.RestAPIPublisherUtil;
 import org.wso2.msf4j.Request;
-
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -49,21 +47,24 @@ import java.util.HashMap;
 public class StreamApiServiceImpl extends StreamApiService {
 
     private static final Logger log = LoggerFactory.getLogger(StreamApiServiceImpl.class);
+
     /**
-     * Retrives all Streams that qualifies for the given fitering attributes
+     * Retrives all Streams that qualifies for the given filtering attributes
      *
      * @param limit       maximum Streams to return
      * @param offset      starting position of the pagination
      * @param query       search query
      * @param ifNoneMatch If-None-Match header value
      * @param request     msf4j request object
-     * @return a list of qualifying APIs
+     * @return a list of qualifying Streams
      * @throws NotFoundException When the particular resource does not exist in the system
      */
     @Override
     public Response streamGet(Integer limit, Integer offset, String query, String ifNoneMatch, Request request) throws NotFoundException {
+
         String username = RestApiUtil.getLoggedInUsername(request);
         StreamListDTO streamListDTO = null;
+
         try {
             streamListDTO = MappingUtil.toStreamListDTO(RestAPIPublisherUtil.getApiPublisher(username).searchStreams(limit, offset, query));
             return Response.ok().entity(streamListDTO).build();
@@ -86,10 +87,10 @@ public class StreamApiServiceImpl extends StreamApiService {
      */
     @Override
     public Response streamPost(EventStream stream, Request request) throws NotFoundException {
-        System.out.println("Stream API is working");
+
         String username = RestApiUtil.getLoggedInUsername(request);
         EventStream.StreamBuilder streamBuilder = MappingUtil.toEventStream(stream);
-        System.out.println(stream.toString());
+
         try {
             APIPublisher apiPublisher = RestAPIPublisherUtil.getApiPublisher(username);
             apiPublisher.addEventStream(streamBuilder);

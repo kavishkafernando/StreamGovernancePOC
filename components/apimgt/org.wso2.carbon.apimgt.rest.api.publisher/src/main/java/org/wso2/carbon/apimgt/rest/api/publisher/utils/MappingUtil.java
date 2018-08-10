@@ -720,7 +720,12 @@ public class MappingUtil {
 
     }
 
-
+    /**
+     * This method converts to Stream model object.
+     *
+     * @param stream EventStream object with Stream data
+     * @return StreamBuilder object
+     */
     public static EventStream.StreamBuilder toEventStream(EventStream stream){
                         EventStream.StreamBuilder streamBuilder = new EventStream.StreamBuilder(stream.getId(),
                                 stream.getName(), stream.getProvider(), stream.getVersion()).
@@ -742,7 +747,6 @@ public class MappingUtil {
                         consumerAuthorization(stream.getConsumerAuthorization()).
                         consumerTransport(stream.getConsumerTransport()).
                         consumerDisplay(stream.getConsumerDisplay());
-
 
         return streamBuilder;
     }

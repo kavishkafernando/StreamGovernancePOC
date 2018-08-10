@@ -744,7 +744,7 @@ public abstract class AbstractAPIManager implements APIManager {
 
 
     /**
-     * Returns details of an Stream.
+     * Returns details of a Stream.
      *
      * @param uuid UUID of the Stream's registry artifact
      * @return A Stream object related to the given artifact id or null
@@ -755,7 +755,7 @@ public abstract class AbstractAPIManager implements APIManager {
         try {
             return streamDAO.getEventStream(uuid);
         } catch (APIMgtDAOException e) {
-            String errorMsg = "Error occurred while retrieving STream with id " + uuid;
+            String errorMsg = "Error occurred while retrieving Stream with id " + uuid;
             log.error(errorMsg, e);
             throw new APIManagementException(errorMsg, e, e.getErrorHandler());
         }
